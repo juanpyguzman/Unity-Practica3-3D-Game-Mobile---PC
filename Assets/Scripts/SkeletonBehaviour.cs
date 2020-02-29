@@ -6,6 +6,12 @@ public class SkeletonBehaviour : MonoBehaviour
 {
 	// Definir Hashes de:
 	// Parametros (Attack, Dead, Distance)
+	static int attackHash = Animator.StringToHash("Attack");
+	static int deadHash = Animator.StringToHash("Dead");
+
+	public Animator animComponent = null;
+	public BoxCollider box;
+
 	// Estados (Attack, Idle)
 	// TODO
 
@@ -13,7 +19,8 @@ public class SkeletonBehaviour : MonoBehaviour
 	PlayerBehaviour _player		= null;     //Puntero a Player (establecido por método 'setPlayer')
 	bool _dead					= false;	// Indica si ya he sido eliminado
 	float _originalColliderZ	= 0;        // Valora original de la posición 'z' del collider
-	float _timeToAttack			= 0;		// Periodo de ataque
+	float _timeToAttack			= 0;        // Periodo de ataque
+	float original_z;
 
 	public void setPlayer(PlayerBehaviour player)
 	{
@@ -22,8 +29,9 @@ public class SkeletonBehaviour : MonoBehaviour
 
 	void Start ()
 	{
-		// Obtener los componentes Animator y el valor original center.z del BoxCollider
-		// TODO
+		animComponent = GetComponent<Animator>();
+		box = GetComponent<BoxCollider>();
+		original_z = box.center.z;
 	}
 	
 	void FixedUpdate ()
@@ -37,7 +45,7 @@ public class SkeletonBehaviour : MonoBehaviour
 		// TODO
 
 		// Desplazar el collider en 'z' un multiplo del parametro Distance
-		// TODO
+		box.center = new Vector3(box.center.x, box.center.y, original_z + animComponent.GetFloat("Distance") * 0.3f);
 	}
 
 	public void attack()

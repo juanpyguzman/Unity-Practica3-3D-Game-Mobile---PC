@@ -4,28 +4,45 @@ using UnityEngine;
 
 public class PlayerBehaviour : MonoBehaviour
 {
+
 	// Definir Hashes de:
 	// Parametros (Speed, Attack, Damage, Dead)
+	static int speedHash = Animator.StringToHash("Speed");
+	static int attackHash = Animator.StringToHash("Attack");
+	static int damageHash = Animator.StringToHash("Damage");
+	static int deadHash = Animator.StringToHash("Dead");
+
+	public Animator animComponent = null;
+	public Rigidbody rigidBody = null;
+	public BoxCollider box;
+
 	// Estados (Base Layer.Idle, Attack Layer.Idle, Attack Layer.Attack)
 	// TODO
 
 	public float walkSpeed		= 1;		// Parametro que define la velocidad de "caminar"
-	public float runSpeed		= 1;		// Parametro que define la velocidad de "correr"
-	public float rotateSpeed	= 160;		// Parametro que define la velocidad de "girar"
+	public float runSpeed		= 2;		// Parametro que define la velocidad de "correr"
+	public float rotateSpeed	= 0.4f;		// Parametro que define la velocidad de "girar"
 
 	// Variables auxiliares
 	float _angularSpeed			= 0;		// Velocidad de giro actual
 	float _speed				= 0;		// Velocidad de traslacion actual
-	float _originalColliderZ	= 0;		// Valora original de la posición 'z' del collider
+	float _originalColliderZ	= 0;        // Valora original de la posición 'z' del collider
+	public float verticalAxis;
+	public float horizontalAxis;
+	float original_z;
 
 	// Variables internas:
 	int _lives = 3;							// Vidas restantes
-	public bool paused = false;				// Indica si el player esta pausado (congelado). Que no responde al Input
+	public bool paused = false;             // Indica si el player esta pausado (congelado). Que no responde al Input
+	public bool attack = false;
 
 	void Start()
 	{
 		// Obtener los componentes Animator, Rigidbody y el valor original center.z del BoxCollider
-		// TODO
+		animComponent = GetComponent<Animator>();
+		rigidBody = GetComponent<Rigidbody>();
+		box = GetComponent<BoxCollider>();
+		original_z = box.center.z;
 	}
 
 	// Aqui moveremos y giraremos la araña en funcion del Input
@@ -34,33 +51,62 @@ public class PlayerBehaviour : MonoBehaviour
 		// Si estoy en pausa no hacer nada (no moverme ni atacar)
 		if (paused) return;
 
-		// Calculo de velocidad lineal (_speed) y angular (_angularSpeed) en función del Input
+		// Cálculo de velocidad lineal (_speed) y angular (_angularSpeed) en función del Input
+		//Descomentar si se quiere usar teclado o GamePad
+		//verticalAxis = Input.GetAxis("Vertical");
+		//horizontalAxis = Input.GetAxis("Horizontal");
+
 		// Si camino/corro hacia delante delante: _speed = walkSpeed   /  _speed = runSpeed
-		// TODO
+		if (verticalAxis > 0.1f)
+		{
+			_speed = walkSpeed;
+		}
 
-		// Si camino/corro hacia delante detras: _speed = -walkSpeed   /  _speed = -runSpeed
-		// TODO
+		if (verticalAxis > 2.0f)
+		{
+			_speed = runSpeed;
+		}
 
+		// Si camino/corro hacia delante detras: _speed = -walkSpeed
+		if (verticalAxis < -0.1f)
+		{
+			_speed = -walkSpeed;
+		}
+		
 		// Si no me muevo: _speed = 0
-		// TODO
+		if (verticalAxis > -0.1f && verticalAxis < 0.1f)
+		{
+			_speed = 0;
+		}
 
 		// Si giro izquierda: _angularSpeed = -rotateSpeed;
-		// TODO
+		if (horizontalAxis < -0.1f)
+		{
+			_angularSpeed = -rotateSpeed;
+		}
 
 		// Si giro derecha: _angularSpeed = rotateSpeed;
-		// TODO
+		if (horizontalAxis > 0.1f)
+		{
+			_angularSpeed = rotateSpeed;
+		}
 
-		// Si no giro : _angularSpeed = 0;
-		// TODO
+		// Si no me muevo: _speed = 0
+		if (horizontalAxis > -0.1f && horizontalAxis < 0.1f)
+		{
+			_angularSpeed = 0;
+		}
 
-		// Actualizamos el parámetro "Speed" en función de _speed. Para activar la anicación de caminar/correr
-		// TODO
+		// Actualizamos el parámetro "Speed" en función de _speed. Para activar la animación de caminar/correr
+		animComponent.SetFloat(speedHash, verticalAxis);
 
-		// Movemov y rotamos el rigidbody (MovePosition y MoveRotation) en función de "_speed" y "_angularSpeed"
-		// TODO
+		// Movemos y rotamos el rigidbody (MovePosition y MoveRotation) en función de "_speed" y "_angularSpeed"
+		rigidBody.AddRelativeForce(Vector3.forward * _speed, ForceMode.VelocityChange);
+		rigidBody.AddTorque(Vector3.up * _angularSpeed, ForceMode.VelocityChange);
+
 
 		// Mover el collider en función del parámetro "Distance" (necesario cuando atacamos)
-		// TODO
+		box.center = new Vector3(box.center.x, box.center.y, original_z + animComponent.GetFloat("Distance") * 10.0f);
 	}
 
 	// En este bucle solamente comprobaremos si el Input nos indica "atacar" y activaremos el trigger "Attack"
@@ -69,7 +115,20 @@ public class PlayerBehaviour : MonoBehaviour
 		// Si estoy en pausa no hacer nada (no moverme ni atacar)
 		// TODO
 
-		// Si detecto Input tecla/boton ataque ==> Activo disparados 'Attack'
+		if (Input.GetKeyDown(KeyCode.Space))
+		{
+			animComponent.SetTrigger(attackHash);
+		}
+
+		if (attack)
+		{
+			animComponent.SetTrigger(attackHash);
+		}
+		else
+		{
+			animComponent.ResetTrigger(attackHash);
+		}
+
 	}
 
 	// Función para resetear el Player
@@ -92,7 +151,7 @@ public class PlayerBehaviour : MonoBehaviour
 	}
 
 	// Funcion recibir daño
-	public void recieveDamage()
+	public void receiveDamage()
 	{
 		// Restar una vida
 		// Si no me quedan vidas notificar al GameManager (notifyPlayerDead) y disparar trigger "Dead"
