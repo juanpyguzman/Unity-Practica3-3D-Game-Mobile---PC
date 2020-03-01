@@ -16,23 +16,25 @@ public class PlayerBehaviour : MonoBehaviour
 	public Rigidbody rigidBody = null;
 	public BoxCollider box;
 
+	public bool usingScreen;
+
 	// Estados (Base Layer.Idle, Attack Layer.Idle, Attack Layer.Attack)
 	// TODO
 
-	public float walkSpeed		= 1;		// Parametro que define la velocidad de "caminar"
-	public float runSpeed		= 2;		// Parametro que define la velocidad de "correr"
-	public float rotateSpeed	= 0.4f;		// Parametro que define la velocidad de "girar"
+	public float walkSpeed = 1;     // Parametro que define la velocidad de "caminar"
+	public float runSpeed = 2;      // Parametro que define la velocidad de "correr"
+	public float rotateSpeed = 0.4f;        // Parametro que define la velocidad de "girar"
 
 	// Variables auxiliares
-	float _angularSpeed			= 0;		// Velocidad de giro actual
-	float _speed				= 0;		// Velocidad de traslacion actual
-	float _originalColliderZ	= 0;        // Valora original de la posición 'z' del collider
+	float _angularSpeed = 0;        // Velocidad de giro actual
+	float _speed = 0;       // Velocidad de traslacion actual
+	float _originalColliderZ = 0;        // Valora original de la posición 'z' del collider
 	public float verticalAxis;
 	public float horizontalAxis;
 	float original_z;
 
 	// Variables internas:
-	int _lives = 3;							// Vidas restantes
+	int _lives = 3;                         // Vidas restantes
 	public bool paused = false;             // Indica si el player esta pausado (congelado). Que no responde al Input
 	public bool attack = false;
 
@@ -52,9 +54,12 @@ public class PlayerBehaviour : MonoBehaviour
 		if (paused) return;
 
 		// Cálculo de velocidad lineal (_speed) y angular (_angularSpeed) en función del Input
-		//Descomentar si se quiere usar teclado o GamePad
-		//verticalAxis = Input.GetAxis("Vertical");
-		//horizontalAxis = Input.GetAxis("Horizontal");
+		//Comprobamos que no se están usando los controles de pantalla
+		if (!usingScreen)
+		{
+			verticalAxis = Input.GetAxis("Vertical");
+			horizontalAxis = Input.GetAxis("Horizontal");
+		}
 
 		// Si camino/corro hacia delante delante: _speed = walkSpeed   /  _speed = runSpeed
 		if (verticalAxis > 0.1f)
@@ -72,7 +77,7 @@ public class PlayerBehaviour : MonoBehaviour
 		{
 			_speed = -walkSpeed;
 		}
-		
+
 		// Si no me muevo: _speed = 0
 		if (verticalAxis > -0.1f && verticalAxis < 0.1f)
 		{
@@ -115,11 +120,20 @@ public class PlayerBehaviour : MonoBehaviour
 		// Si estoy en pausa no hacer nada (no moverme ni atacar)
 		// TODO
 
-		if (Input.GetKeyDown(KeyCode.Space))
+		if (Input.GetKeyDown(KeyCode.Space) && !usingScreen)
 		{
-			animComponent.SetTrigger(attackHash);
+			attackAction(true);
 		}
 
+		if (usingScreen)
+		{
+			attackAction(attack);
+		}
+	}
+
+	//Función attack
+	private void attackAction(bool attack)
+	{
 		if (attack)
 		{
 			animComponent.SetTrigger(attackHash);
@@ -128,8 +142,8 @@ public class PlayerBehaviour : MonoBehaviour
 		{
 			animComponent.ResetTrigger(attackHash);
 		}
-
 	}
+
 
 	// Función para resetear el Player
 	public void reset()

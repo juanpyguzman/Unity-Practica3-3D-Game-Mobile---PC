@@ -28,6 +28,10 @@ public class CrossARButton : UIBehaviour
 
 		if(pushed)
 		{
+			//Indicamos a PlayerBehaviour que se están usando los botones de pantalla
+			// para deshabilitar los Input de teclado o mando
+			Player.GetComponent<PlayerBehaviour>().usingScreen = true;
+
 			if (input1 == InputType.NONE ) input1 = input;
 			else if(input2 == InputType.NONE) input2 = input;
 			
@@ -71,6 +75,10 @@ public class CrossARButton : UIBehaviour
 				Player.GetComponent<PlayerBehaviour>().verticalAxis = 0.0f;
 				Player.GetComponent<PlayerBehaviour>().horizontalAxis = 0.0f;
 				Player.GetComponent<PlayerBehaviour>().attack = false;
+
+				//Indicamos a PlayerBehaviour que no se están usando los botones de pantalla
+				// para habilitar los Input de teclado o mando
+				Player.GetComponent<PlayerBehaviour>().usingScreen = false;
 			}
 		}
 	}
