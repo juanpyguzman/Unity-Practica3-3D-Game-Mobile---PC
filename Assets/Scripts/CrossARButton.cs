@@ -62,7 +62,7 @@ public class CrossARButton : UIBehaviour
 
 			if (input1 == InputType.R)
 			{
-
+				Player.GetComponent<PlayerBehaviour>().verticalAxis *= Player.GetComponent<PlayerBehaviour>().runSpeed;
 			}
 		}
 		else

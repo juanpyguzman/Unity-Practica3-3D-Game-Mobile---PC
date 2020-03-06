@@ -26,7 +26,8 @@ public class GameManager : MonoBehaviour
 	void Start ()
 	{
 		currentEnemiesList = new List<SkeletonBehaviour>();
-		
+
+		UIManager.instance.hideHUD();
 		// Reiniciamos el juego
 		// TODO
 	}
@@ -55,10 +56,11 @@ public class GameManager : MonoBehaviour
 	public void onStartGameButton()
 	{
 		// Ocultamos el menu principal (UIManager)
-		// TODO
+		UIManager.instance.hideMainMenu();
+		UIManager.instance.showHUD();
 
 		// Actualizamos la puntuacion en el panel Score (UIManager)
-		// TODO
+		UIManager.instance.updateScore(_score);
 
 		// Quitamos la pausa a Player
 		// TODO
@@ -68,7 +70,8 @@ public class GameManager : MonoBehaviour
 	public void onExitGameButton()
 	{
 		// Mostramos el panel principal
-		// TODO
+		UIManager.instance.showMainMenu();
+		UIManager.instance.hideHUD();
 
 		// Reseteamos el juego
 		// TODO
@@ -83,12 +86,16 @@ public class GameManager : MonoBehaviour
 		currentEnemiesList.Remove(enemy);
 
 		// Subimos 10 puntos y actualizamos la puntuacion en la UI
-		// TODO
+		_score += 10;
+		UIManager.instance.updateScore(_score);
+
 
 		// Si no quedan enemmigos
 		if (currentEnemiesList.Count == 0)	// KEEP
 		{
-			// Mostrar panel de 'Mision cumplida' y pausar a Player
+			// Mostrar panel de 'Misión cumplida' y pausar a Player
+			Debug.Log("Misión cumplida");
+			UIManager.instance.showEndPanel(true);
 			// TODO
 		}
 	}
@@ -97,7 +104,8 @@ public class GameManager : MonoBehaviour
 	public void notifyPlayerDead()
 	{
 		// Mostrar panel de 'Mision fallida' y pausar a Player
-		// TODO
+		UIManager.instance.showEndPanel(false);
+		Debug.Log("GAME OVER");
 	}
 	#endregion
 }

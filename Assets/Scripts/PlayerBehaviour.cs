@@ -10,6 +10,7 @@ public class PlayerBehaviour : MonoBehaviour
 	static int speedHash = Animator.StringToHash("Speed");
 	static int attackHash = Animator.StringToHash("Attack");
 	static int damageHash = Animator.StringToHash("Damage");
+	static int distanceHash = Animator.StringToHash("Distance");
 	static int deadHash = Animator.StringToHash("Dead");
 
 	public Animator animComponent = null;
@@ -22,7 +23,7 @@ public class PlayerBehaviour : MonoBehaviour
 	// TODO
 
 	public float walkSpeed = 1;     // Parametro que define la velocidad de "caminar"
-	public float runSpeed = 2;      // Parametro que define la velocidad de "correr"
+	public float runSpeed = 2.1f;      // Parametro que define la velocidad de "correr"
 	public float rotateSpeed = 0.4f;        // Parametro que define la velocidad de "girar"
 
 	// Variables auxiliares
@@ -34,9 +35,12 @@ public class PlayerBehaviour : MonoBehaviour
 	float original_z;
 
 	// Variables internas:
-	int _lives = 3;                         // Vidas restantes
+	int _lifes = 3;                         // Vidas restantes
 	public bool paused = false;             // Indica si el player esta pausado (congelado). Que no responde al Input
 	public bool attack = false;
+
+	//Variable bool para limitar a 1 ataque cada vez que se realiza la colisión en modo ataque
+	private bool singleAttack;
 
 	void Start()
 	{
@@ -59,6 +63,11 @@ public class PlayerBehaviour : MonoBehaviour
 		{
 			verticalAxis = Input.GetAxis("Vertical");
 			horizontalAxis = Input.GetAxis("Horizontal");
+			if (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift))
+			{
+				verticalAxis *= runSpeed;
+			}
+
 		}
 
 		// Si camino/corro hacia delante delante: _speed = walkSpeed   /  _speed = runSpeed
@@ -168,19 +177,38 @@ public class PlayerBehaviour : MonoBehaviour
 	public void receiveDamage()
 	{
 		// Restar una vida
+		_lifes--;
+		Debug.Log("Vidas: " + _lifes);
+
 		// Si no me quedan vidas notificar al GameManager (notifyPlayerDead) y disparar trigger "Dead"
-		// TODO
+		if (_lifes == 0)
+		{
+			animComponent.SetTrigger(deadHash);
+
+			//NOTIFICAR FIN DE JUEGO
+			GameManager.instance.notifyPlayerDead();
+		}
 
 		// Si aun me quedan vidas dispara el trigger TakeDamage
-		// TODO
+		if (_lifes > 0)
+		{
+			animComponent.SetTrigger(damageHash);
+		}
 	}
 
 	private void OnCollisionEnter(Collision collision)
 	{
-		// Obtener estado actual de la capa Attack Layer
-		// TODO
-
+		singleAttack = true;
+	}
+	private void OnCollisionStay(Collision collision)
+	{
 		// Si el estado es 'Attack' matamos al enemigo (mirar etiqueta)
-		// TODO
+		if (singleAttack && animComponent.GetCurrentAnimatorStateInfo(1).IsName("Attack") && animComponent.GetFloat(distanceHash) > 0 && collision.gameObject.tag == "Enemy")
+		{
+			collision.gameObject.GetComponent<SkeletonBehaviour>().kill();
+			singleAttack = false;
+		}
+
+
 	}
 }
