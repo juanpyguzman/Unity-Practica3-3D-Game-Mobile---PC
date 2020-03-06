@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Audio;
 
 public class PlayerBehaviour : MonoBehaviour
 {
@@ -42,6 +43,14 @@ public class PlayerBehaviour : MonoBehaviour
 	//Variable bool para limitar a 1 ataque cada vez que se realiza la colisión en modo ataque
 	private bool singleAttack;
 
+	//Sonidos
+	public AudioClip attackAudio = null;
+	public AudioClip damageAudio = null;
+	public AudioClip deadAudio = null;
+	public AudioClip stepsAudio = null;
+
+	public AudioSource source = null;
+
 	void Start()
 	{
 		// Obtener los componentes Animator, Rigidbody y el valor original center.z del BoxCollider
@@ -49,6 +58,8 @@ public class PlayerBehaviour : MonoBehaviour
 		rigidBody = GetComponent<Rigidbody>();
 		box = GetComponent<BoxCollider>();
 		original_z = box.center.z;
+
+		source = GetComponent<AudioSource>();
 	}
 
 	// Aqui moveremos y giraremos la araña en funcion del Input
@@ -118,6 +129,16 @@ public class PlayerBehaviour : MonoBehaviour
 		rigidBody.AddRelativeForce(Vector3.forward * _speed, ForceMode.VelocityChange);
 		rigidBody.AddTorque(Vector3.up * _angularSpeed, ForceMode.VelocityChange);
 
+		if(_speed!=0.0f && !source.isPlaying)
+		{
+			source.clip = stepsAudio;
+			source.Play();
+		}
+
+		if (_speed == 0.0f && source.clip == stepsAudio)
+		{
+			source.Stop();
+		}
 
 		// Mover el collider en función del parámetro "Distance" (necesario cuando atacamos)
 		box.center = new Vector3(box.center.x, box.center.y, original_z + animComponent.GetFloat("Distance") * 10.0f);
@@ -146,6 +167,9 @@ public class PlayerBehaviour : MonoBehaviour
 		if (attack)
 		{
 			animComponent.SetTrigger(attackHash);
+			source.clip = attackAudio;
+			source.PlayDelayed(0.5f);
+
 		}
 		else
 		{
@@ -184,6 +208,8 @@ public class PlayerBehaviour : MonoBehaviour
 		if (_lifes == 0)
 		{
 			animComponent.SetTrigger(deadHash);
+			source.clip = deadAudio;
+			source.PlayDelayed(1.0f);
 
 			//NOTIFICAR FIN DE JUEGO
 			GameManager.instance.notifyPlayerDead();
@@ -193,6 +219,8 @@ public class PlayerBehaviour : MonoBehaviour
 		if (_lifes > 0)
 		{
 			animComponent.SetTrigger(damageHash);
+			source.clip = damageAudio;
+			source.PlayDelayed(0.5f);
 		}
 	}
 

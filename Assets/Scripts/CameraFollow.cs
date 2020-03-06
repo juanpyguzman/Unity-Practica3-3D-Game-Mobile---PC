@@ -8,8 +8,16 @@ public class CameraFollow : MonoBehaviour {
 	public GameObject cameraPosition;
 	public float metersUp = 0;
 
-
 	public float smoothFactor = 1f;
+
+	public AudioSource source;
+
+	private void Start()
+	{
+		source = GetComponent<AudioSource>();
+		source.loop = true;
+		source.Play();
+	}
 
 	// Update is called once per frame
 	void LateUpdate () {
