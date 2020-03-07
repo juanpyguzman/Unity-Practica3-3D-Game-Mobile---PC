@@ -20,11 +20,13 @@ public class UISoundButtonBehaviour : MonoBehaviour
 		if(GameManager.instance.soundEnabled)
 		{
 			buttonImage.sprite = SoundOn;
+			GameObject.Find("Main Camera").GetComponent<AudioListener>().enabled = true;
 		}
 		
 		else
 		{
 			buttonImage.sprite = SoundOff;
+			GameObject.Find("Main Camera").GetComponent<AudioListener>().enabled = false;
 		}
 		
 		// TODO
