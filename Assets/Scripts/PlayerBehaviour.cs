@@ -29,11 +29,11 @@ public class PlayerBehaviour : MonoBehaviour
 
 	// Variables auxiliares
 	float _angularSpeed = 0;        // Velocidad de giro actual
-	float _speed = 0;       // Velocidad de traslacion actual
-	float _originalColliderZ = 0;        // Valora original de la posición 'z' del collider
+	float _speed = 0;			  // Velocidad de traslacion actual
+	float original_z;			  // Valora original de la posición 'z' del collider
 	public float verticalAxis;
 	public float horizontalAxis;
-	float original_z;
+
 
 	// Variables internas:
 	int _lifes = 3;                         // Vidas restantes
@@ -148,7 +148,7 @@ public class PlayerBehaviour : MonoBehaviour
 	private void Update()
 	{
 		// Si estoy en pausa no hacer nada (no moverme ni atacar)
-		// TODO
+		if (paused) return;
 
 		if (Input.GetKeyDown(KeyCode.Space) && !usingScreen)
 		{
@@ -182,19 +182,23 @@ public class PlayerBehaviour : MonoBehaviour
 	public void reset()
 	{
 		//Reiniciar el numero de vidas
-		// TODO
+		_lifes = 3;
+		UIManager.instance.hideEndPanel();
 
 		// Pausamos a Player
-		// TODO
+		paused = true;
 
 		// Forzar estado Idle en las dos capas (Base Layer y Attack Layer): función Play() de Animator
-		// TODO
+		animComponent.Play("Idle",0);
+		animComponent.Play("Idle", 1);
 
 		// Reseteo todos los triggers (Attack y Dead)
-		// TODO
+		animComponent.ResetTrigger(attackHash);
+		animComponent.ResetTrigger(deadHash);
 
 		// Posicionar el jugador en el (0,0,0) y rotación nula (Quaternion.identity)
-		// TODO
+		transform.position = Vector3.zero;
+		transform.rotation = Quaternion.identity;
 	}
 
 	// Funcion recibir daño

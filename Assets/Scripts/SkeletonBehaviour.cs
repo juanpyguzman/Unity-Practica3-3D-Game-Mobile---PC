@@ -21,10 +21,9 @@ public class SkeletonBehaviour : MonoBehaviour
 
 	// Variables auxiliares 
 	PlayerBehaviour _player		= null;     //Puntero a Player (establecido por método 'setPlayer')
-	bool _dead					= false;	// Indica si ya he sido eliminado
-	float _originalColliderZ	= 0;        // Valora original de la posición 'z' del collider
+	float original_z;				 // Valora original de la posición 'z' del collider
 	float _timeToAttack			= 1.0f;        // Periodo de ataque
-	float original_z;
+	
 
 	private float lastTimeAttack = 0.0f;
 
@@ -105,7 +104,8 @@ public class SkeletonBehaviour : MonoBehaviour
 	// Funcion para resetear el collider (activado por defecto), la variable donde almaceno si he muerto y forzar el estado "Idle" en Animator
 	public void reset()
 	{
-		// TODO
+		animComponent.Play("Idle", 0);
+		gameObject.GetComponent<Collider>().enabled = true;
 	}
 
 	private void OnCollisionEnter(Collision collision)

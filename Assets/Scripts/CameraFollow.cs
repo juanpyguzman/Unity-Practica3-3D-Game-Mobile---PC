@@ -15,7 +15,7 @@ public class CameraFollow : MonoBehaviour {
 	private void Start()
 	{
 		source = GetComponent<AudioSource>();
-		source.loop = true;
+		source.loop = true;	
 		source.Play();
 	}
 

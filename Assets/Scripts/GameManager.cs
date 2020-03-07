@@ -29,16 +29,18 @@ public class GameManager : MonoBehaviour
 
 		UIManager.instance.hideHUD();
 		// Reiniciamos el juego
+
+		reset();
 		// TODO
 	}
 
 	private void reset()		// Funcion para reiniciar el juego
 	{
 		// Reiniciamos a Player
-		// TODO
+		player.GetComponent<PlayerBehaviour>().reset();
 
 		// Incializamos la puntuacion a cero
-		// TODO
+		_score = 0;
 
 		// Rellenamos la lista de enemigos actual.
 		currentEnemiesList.Clear();
@@ -63,7 +65,7 @@ public class GameManager : MonoBehaviour
 		UIManager.instance.updateScore(_score);
 
 		// Quitamos la pausa a Player
-		// TODO
+		player.GetComponent<PlayerBehaviour>().paused = false;
 	}
 
 	// Evento al pulsar boton 'Exit'
@@ -74,7 +76,7 @@ public class GameManager : MonoBehaviour
 		UIManager.instance.hideHUD();
 
 		// Reseteamos el juego
-		// TODO
+		reset();
 	}
 	#endregion
 
